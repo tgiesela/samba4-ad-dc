@@ -28,11 +28,17 @@ docker run
         -d yourimage
 ```
 
-You can omit the three password environment variables. The init script will 
+You can omit the two password environment variables. The init script will 
 generate random passwords and display the passwords in the docker logs.
 
 The volume parameters (-v) can be used to store the configuration of samba and
 the ldap database. You can also use a data container to persist the data.
+
+If you want the domain controller to be accessible to the outside world you
+can export the ports mentioned in the Dockerfile.
+Note: 	I don't use it that way. I connect to the docker host using an openvpn
+	connection. This gives the clients access to the domain controller without
+	exposing the ports on the docker host.
 
 ## Environment variables
 
