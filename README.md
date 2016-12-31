@@ -4,7 +4,7 @@ Samba4 Active directory project for docker with SSH installed.
 ## First time configuration
 Build the docker image:
 
->docker build .
+>docker build -t <yourimage>.
 
 When starting the image for the first time, some additional parameters are
 required to configure the Active Directory domain controller:
@@ -25,7 +25,7 @@ docker run
         --dns=127.0.0.1 
         --net=dvv 
        --ip=<your-fixed-ip-address> 
-        -d tgiesela/samba4:v0.1
+        -d <yourimage>
 ```
 
 You can omit the three password environment variables. The init script will 
