@@ -6,6 +6,7 @@ SAMBA_DOMAIN=${SAMBA_DOMAIN:-samdom}
 SAMBA_REALM=${SAMBA_REALM:-samdom.example.com}
 ROOT_PASSWORD=${ROOT_PASSWORD:-$(pwgen -cny -c -n -1 12)}
 SAMBA_ADMIN_PASSWORD=${SAMBA_ADMIN_PASSWORD:-$(pwgen -cny 10 1)}
+KERBEROS_PASSWORD=${KERBEROS_PASSWORD:-$(pwgen -cny 10 1)}
 
 
 [ -n "$SAMBA_DOMAIN" ] \
@@ -21,9 +22,11 @@ fi
 appSetup () {
     touch /etc/samba/.alreadysetup
 
+    export KERBEROS_PASSWORD=${KERBEROS_PASSWORD}
     echo "root:${ROOT_PASSWORD}" | chpasswd
     echo Root password: ${ROOT_PASSWORD}
     echo Samba administrator password: ${SAMBA_ADMIN_PASSWORD}
+    echo Kerberos KDC database master key: ${KERBEROS_PASSWORD}
     echo Samba options: ${SAMBA_OPTIONS}
 
     # Provision Samba
@@ -39,6 +42,16 @@ appSetup () {
 	${SAMBA_HOST_IP} \
 	${SAMBA_OPTIONS} \
 	--option="bind interfaces only"=yes
+
+    #rm /etc/krb5.conf 
+    #ln -sf /usr/local/samba/private/krb5.conf /etc/krb5.conf
+
+    # cp /var/lib/samba/private/krb5.conf /etc/krb5.conf
+    # Create Kerberos database
+#    expect kdb5_util_create.expect
+    # Export kerberos keytab for use with sssd
+    samba-tool domain exportkeytab /etc/krb5.keytab --principal ${HOSTNAME}\$
+    #sed -i "s/SAMBA_REALM/${SAMBA_REALM}/" /etc/sssd/sssd.conf
 
 # Update dns-forwarder if required
 [ -n "$SAMBA_DNS_FORWARDER" ] \
