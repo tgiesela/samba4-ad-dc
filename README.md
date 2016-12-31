@@ -9,7 +9,7 @@ Build the docker image:
 When starting the image for the first time, some additional parameters are
 required to configure the Active Directory domain controller:
 
-...
+```
 >docker run 
 >        --privileged 
 >        -h pdc 
@@ -26,7 +26,7 @@ required to configure the Active Directory domain controller:
 >        --net=dvv 
 >       --ip=<your-fixed-ip-address> 
 >        -d tgiesela/samba4:v0.1
-...
+```
 
 You can omit the three password environment variables. The init script will 
 generate random passwords and display the passwords in the docker logs.
