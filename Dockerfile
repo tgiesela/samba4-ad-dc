@@ -46,8 +46,8 @@ RUN apt-get install -y expect pwgen
 RUN rm /etc/krb5.conf && \
     ln -sf /var/lib/samba/private/krb5.conf /etc/krb5.conf
 
-ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-ADD init.sh /init.sh
+ADD scripts/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+ADD scripts/init.sh /init.sh
 RUN chmod 755 /init.sh
 RUN apt-get clean
 EXPOSE 22 53 389 88 135 139 138 445 464 3268 3269
