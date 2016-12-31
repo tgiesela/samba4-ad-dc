@@ -34,7 +34,7 @@ generate random passwords and display the passwords in the docker logs.
 The volume parameters (-v) can be used to store the configuration of samba and
 the ldap database. You can also use a data container to persist the data.
 
-## Environement variables
+## Environment variables
 
 - SAMBA_REALM:  the actual domain name
 - SAMBA_DOMAIN: the short domain name used by samba
