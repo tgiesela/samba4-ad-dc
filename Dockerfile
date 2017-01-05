@@ -8,7 +8,7 @@ VOLUME ["/var/lib/samba", "/etc/samba"]
 # Setup ssh and install supervisord
 RUN apt-get update
 RUN apt-get upgrade -y
-RUN apt-get install -y openssh-server supervisor net-tools nano apt-utils wget rsyslog
+RUN apt-get install -y openssh-server supervisor net-tools nano apt-utils wget
 
 # Install sambe pre-requisites
 RUN apt-get install -y acl attr autoconf bison build-essential \
