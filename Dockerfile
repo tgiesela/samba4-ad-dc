@@ -22,7 +22,7 @@ RUN apt-get install -y acl attr autoconf bison build-essential \
 
 RUN mkdir -p /home/samba && cd /home/samba
 WORKDIR /home/samba
-RUN wget https://download.samba.org/pub/samba/stable/samba-4.5.3.tar.gz
+RUN wget --no-check-certificate https://download.samba.org/pub/samba/stable/samba-4.5.3.tar.gz
 RUN tar -zxf samba-4.5.3.tar.gz
 WORKDIR /home/samba/samba-4.5.3/
 RUN ./configure --sysconfdir=/etc/samba/ \ 
@@ -48,7 +48,9 @@ RUN rm /etc/krb5.conf && \
 
 ADD scripts/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 ADD scripts/init.sh /init.sh
+ADD scripts/samba_backup /usr/sbin/samba_backup
 RUN chmod 755 /init.sh
+RUN rm -r /home/samba/
 RUN apt-get clean
 EXPOSE 22 53 389 88 135 139 138 445 464 3268 3269
 ENTRYPOINT ["/init.sh"]

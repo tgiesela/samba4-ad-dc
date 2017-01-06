@@ -2,6 +2,7 @@
 
 DEFAULT_DOMAIN="test.local"
 DEFAULT_DATAFOLDER=/dockerdata
+DEFAULT_BACKUPFOLDER=/dockerbackup
 
 read -p "Password for root/samba/kerberos user: " ROOT_PASSWORD
 
@@ -26,6 +27,11 @@ if [ -z $DATAFOLDER ]; then
     DATAFOLDER=${DEFAULT_DATAFOLDER}
 fi
 
+read -p "Name of folder to store backups (${DEFAULT_BACKUPFOLDER}): " BACKUPFOLDER
+if [ -z $BACKUPFOLDER ]; then
+    BACKUPFOLDER=${DEFAULT_BACKUPFOLDER}
+fi
+
 read -p "Do you want to use custom network? (y/n) " yn
 case $yn in
     [Yy]* )
@@ -44,6 +50,7 @@ docker run \
 	-v ${DATAFOLDER}/samba:/var/lib/samba \
 	-v ${DATAFOLDER}/samba:/etc/samba \
 	-v ${DATAFOLDER}/sambashares:/shares \
+	-v ${BACKUPFOLDER}/samba:/backup \
 	-e SAMBA_REALM="${SAMBA_DOMAIN}" \
 	-e SAMBA_DOMAIN="${SAMBA_REALM}" \
 	-e ROOT_PASSWORD="${ROOT_PASSWORD}" \
