@@ -63,6 +63,6 @@ docker run \
 	--dns-search=$(echo ${SAMBA_DOMAIN}| awk '{print tolower($0)}') \
         ${CUSTOMNETWORKNAME} \
 	${IP_COMMAND} \
-	-d tgiesela/samba4:v0.1
+	-d tgiesela/samba:v0.1
 
 #	--add-host localhost:127.0.0.1 \

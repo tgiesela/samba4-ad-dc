@@ -57,6 +57,9 @@ appSetup () {
 [ -n "$SAMBA_DNS_FORWARDER" ] \
     && sed -i "s/dns forwarder = .*/dns forwarder = $SAMBA_DNS_FORWARDER/" /etc/samba/smb.conf
 
+# Grant Domain Admins the right to set share permission
+    net rpc rights grant "VERZUIM\Domain Admins" SeDiskOperatorPrivilege -U "VERZUIM\Administrator"%${SAMBA_ADMIN_PASSWORD}
+
 }
 
 appStart () {
