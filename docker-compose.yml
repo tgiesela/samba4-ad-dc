@@ -1,0 +1,98 @@
+version: '3'
+services:
+   samba:
+      build: ./samba-dc
+      container_name: samba-dc
+      image: tgiesela/samba-dc:v0.1
+      hostname: samba-dc
+      domainname: test.local
+      restart: always
+      networks:
+         - domainnet
+      ports: 
+        - 53:53     #dns tcp
+        - 53:53/udp #dns udp
+        - 88:88     #kerberos tcp
+        - 88:88/udp #kerberos udp
+        - 135:135       #end point mapper (DCE/RPC)
+        - 137:137/udp   #NetBIOS Name Service
+        - 138:138/udp   #NetBIOS Datagram
+        - 139:139       #NetBIOS Session
+        - 389:389       #ldap tcp
+        - 389:389/udp   #ldap udp
+        - 445:445       #smb over tcp
+        - 464:464       #kerberos kpasswd tcp
+        - 464:464/udp   #kerberos kpasswd udp
+        - 636:636       #ldaps
+        - 3268:3268     #global catalog
+        - 3269:3269     #global catalog SSL
+        - 49152-49160:49152-49160 #Dynamic RPC ports
+      expose:
+        - 53    #dns
+        - 88    #kerberos
+        - 135   #end point mapper (DCE/RPC)
+        - 137   #NetBIOS Name Service
+        - 138   #NetBIOS Datagram
+        - 139   #NetBIOS Session
+        - 389   #ldap
+        - 445   #smb over tcp
+        - 464   #kerberos kpasswd
+        - 636   #ldaps
+        - 3268  #global catalog
+        - 3269  #global catalog SSL
+        - 49152-49160 #Dynamic RPC ports
+      privileged: true
+      environment:
+         - TZ=Europe/Amsterdam
+         - SAMBA_REALM=${SAMBA_REALM}
+         - SAMBA_DOMAIN=${SAMBA_DOMAIN}
+         - ROOT_PASSWORD=${ROOT_PASSWORD}
+         - SAMBA_ADMIN_PASSWORD=${ROOT_PASSWORD}
+         - KERBEROS_PASSWORD=${ROOT_PASSWORD}
+         - SAMBA_DNS_FORWARDER=8.8.8.8
+         - SAMBA_HOST_IP=${FIXED_IP_ADDRESS}
+      dns:
+         - 127.0.0.1
+      dns_search:
+         - ${SAMBA_DOMAIN_LC}
+      volumes:
+         - ${DATAFOLDER}/data/certificates/:/certificates/
+         - ${DATAFOLDER}/samba:/var/lib/samba \
+         - ${DATAFOLDER}/samba:/etc/samba \
+         - ${DATAFOLDER}/sambashares:/shares \
+         - ${BACKUPFOLDER}/samba:/backup \
+
+   ntp:
+      build: ./ntp
+      container_name: ntpserver
+      image: tgiesela/ntpserver:v0.1
+      hostname: ntpserver
+      domainname: test.local
+      restart: always
+      networks:
+         - domainnet
+      ports: 
+        - 123:123/udp   #ntp udp
+      privileged: true
+      environment:
+         - TZ=Europe/Amsterdam
+      volumes:
+         - ./ntp/scripts/ntp.conf:/etc/ntp.conf
+
+networks:
+    domainnet:
+         name: domainnet
+         driver: bridge
+         enable_ipv6: false
+         ipam:
+            driver: default
+            config:
+               - subnet: 172.19.0.0/16
+                 gateway: 172.19.0.1
+
+#volumes:
+#    maildata:/mnt/media
+
+#volumes:
+#  maildata:/dockerdata/mail
+#    driver: local
