@@ -28,7 +28,7 @@
 
 
 
-FROMWHERE=/etc/samba
+FROMWHERE=/usr/local/samba
 WHERE=/backup
 DAYS=90				# Set default retention period.
 if [ -n "$1" ] && [ "$1" = "-h" -o "$1" = "--usage" ]; then

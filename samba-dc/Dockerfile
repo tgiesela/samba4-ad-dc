@@ -2,15 +2,12 @@ FROM debian
 
 ENV DEBIAN_FRONTEND noninteractive
 
-VOLUME ["/var/lib/samba", "/etc/samba"]
-
-# Setup and install supervisord
+# Setup and install tools
 RUN apt-get update
 RUN apt-get upgrade -y
-RUN apt-get install -y supervisor net-tools nano apt-utils wget procps
+RUN apt-get install -y net-tools nano apt-utils wget procps
 
 # Install sambe pre-requisites
-RUN apt-get install -y 
 RUN apt-get -y install \
     acl apt-utils attr autoconf bind9utils binutils \
     bison build-essential ccache chrpath curl \
@@ -45,26 +42,25 @@ WORKDIR /home/samba
 RUN wget --no-check-certificate https://download.samba.org/pub/samba/stable/samba-4.17.5.tar.gz
 RUN tar -zxf samba-4.17.5.tar.gz
 WORKDIR /home/samba/samba-4.17.5/
-RUN ./configure --sysconfdir=/etc/samba/ 
+RUN ./configure --sysconfdir=/etc/samba \
+                --prefix=/ \
+                --with-privatedir=/usr/local/samba/private \
+                --with-bind-dns-dir=/usr/local/samba 
                 
 RUN make && make install
 
-RUN mkdir -p /var/log/supervisor
-
 # Install utilities needed for setup
 RUN apt-get install -y expect pwgen
-#ADD kdb5_util_create.expect kdb5_util_create.expect
 
 # Set kerberos parameters
 RUN rm /etc/krb5.conf && \
-    ln -sf /usr/local/samba/private/krb5.conf /etc/krb5.conf
+    ln -sf /etc/samba/private/krb5.conf /etc/krb5.conf
 
-ADD scripts/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 ADD scripts/init.sh /init.sh
-ADD scripts/samba_backup /usr/sbin/samba_backup
+ADD scripts/samba_backup.sh /usr/sbin/samba_backup.sh
 RUN chmod 755 /init.sh
 RUN rm -r /home/samba/
 RUN apt-get clean
-EXPOSE 53 123 135 137 138 139 445 464 3268 3269 49152-49160
+EXPOSE 53 135 137 138 139 445 464 3268 3269 49152-49160
 ENTRYPOINT ["/init.sh"]
 CMD ["app:start"]

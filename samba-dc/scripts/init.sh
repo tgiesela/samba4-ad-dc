@@ -21,6 +21,10 @@ appSetup () {
     # Provision Samba
    echo Provisioning SAMBA --domain=${SAMBA_REALM} --realm=${SAMBA_DOMAIN} --host-ip=${SAMBA_HOST_IP} 
 
+   samba -b > /tmp/builddirs
+   PIDDIR=$(cat /tmp/builddirs|grep PIDDIR:|sed 's/PIDDIR://')
+   PRIVATEDIR=$(cat /tmp/builddirs|grep PRIVATE_DIR:|sed 's/PRIVATE_DIR://')
+
    samba-tool domain provision \
 	--use-rfc2307 \
 	--server-role=dc\
@@ -34,7 +38,7 @@ appSetup () {
     startSambaBackground
 #   copy krb5.conf according to output from provision command (e.g. do not create symlink!)
     rm /etc/krb5.conf
-    cp /usr/local/samba/private/krb5.conf /etc/krb5.conf
+    cp ${PRIVATEDIR}/krb5.conf /etc/krb5.conf
 
 #   Test zone lookup
     echo " TESTING DNS LOOKUP "
@@ -60,23 +64,23 @@ appSetup () {
 # Grant Domain Admins the right to set share permission
     net rpc rights grant "Domain Admins" SeDiskOperatorPrivilege -U "${SAMBA_REALM}/Administrator"%${SAMBA_ADMIN_PASSWORD}
 
-    pid=$(cat /usr/local/samba/var/run/samba.pid);kill -9 $pid
+    pid=$(cat $PIDDIR/samba.pid);kill -9 $pid
 
-    touch /etc/samba/.alreadysetup
+    touch /.alreadysetup
 }
 
 startSambaBackground() {
     # Start the services
-    /usr/local/samba/sbin/samba --daemon
+    samba --daemon
 }
 startSamba() {
     # Start the services
-    /usr/local/samba/sbin/samba -i
+    samba -i
 }
 
 appStart () {
     export PATH=/usr/local/samba/bin/:/usr/local/samba/sbin/:$PATH
-    [ -f /etc/samba/.alreadysetup ] && echo "Skipping setup..." || appSetup
+    [ -f /.alreadysetup ] && echo "Skipping setup..." || appSetup
     startSamba
 }
 

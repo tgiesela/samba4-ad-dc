@@ -56,11 +56,10 @@ services:
       dns_search:
          - ${SAMBA_DOMAIN_LC}
       volumes:
-         - ${DATAFOLDER}/data/certificates/:/certificates/
-         - ${DATAFOLDER}/samba:/var/lib/samba \
-         - ${DATAFOLDER}/samba:/etc/samba \
-         - ${DATAFOLDER}/sambashares:/shares \
-         - ${BACKUPFOLDER}/samba:/backup \
+         - ${DATAFOLDER}/samba:/etc/samba
+         - ${DATAFOLDER}/sambalocal:/usr/local/samba
+         - ${DATAFOLDER}/sambashares:/shares
+         - ${BACKUPFOLDER}/sambabackup:/backup
 
    ntp:
       build: ./ntp
@@ -89,9 +88,6 @@ networks:
             config:
                - subnet: 172.19.0.0/16
                  gateway: 172.19.0.1
-
-#volumes:
-#    maildata:/mnt/media
 
 #volumes:
 #  maildata:/dockerdata/mail

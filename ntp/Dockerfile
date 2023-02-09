@@ -6,7 +6,7 @@ VOLUME ["/etc/ntp.conf"]
 # Setup and install various tools
 RUN apt-get update
 RUN apt-get upgrade -y
-RUN apt-get install -y net-tools nano apt-utils wget procps
+RUN apt-get install -y net-tools nano apt-utils wget procps dnsutils
 
 # Install sambe pre-requisites
 RUN apt-get -y install ntp ntpdate
